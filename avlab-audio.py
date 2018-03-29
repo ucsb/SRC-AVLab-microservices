@@ -1,8 +1,28 @@
 #!/usr/bin/env python
 '''
 processes raw transfers of magnetic tape
-'''
 
+USAGE:
+  avlab-audio.py -m [options] -i [filename]
+    options:
+	  -m [batch, single]
+      -i [filename]
+    example:
+      avlab-audio.py -m batch
+      avlab-audio.py -m single -i 0b37c815-b243-4d2f-8b4a-d954cc6f98381
+
+PYTHON STANDARD MODULES:
+  argparse: Parser for command-line options, arguments and sub-commands
+  getpass: Portable password input
+  os: Miscellaneous operating system interfaces
+  subprocess: Subprocess management
+  csv: CSV File Reading and Writing
+  re: Regular expression operations
+  ast: Abstract Syntax Trees
+  time: Time access and conversions
+  sys: System-specific parameters and functions
+  pydbc: Support for method preconditions, method postconditions and class invariants
+'''
 import argparse
 import getpass
 import os
