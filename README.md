@@ -4,10 +4,10 @@ Please see AVLab Utility Software List & Installation Instructions (on the wiki)
 * [Intro](#intro)
 * [config](#config)
 * [makesomethings](#makesomethings)
+   * [makeaccess (formerly makemp3)](#makemp3)
    * [makebarcodes](#makebarcodes)
    * [makebroadcast](#makebroadcast)
    * [makedip](#makedip)
-   * [makemp3](#makemp3)
    * [makeqctoolsreport](#makeqctoolsreport)
    * [makestartobject](#makestartobject)
    * [makereverse](#makereverse)
@@ -48,6 +48,9 @@ For UCSB users, the "canonical" config file can be found at S:/avlab/microservic
 # makesomething
 the make-scripts are kind of the atomic units of our microservices. They work on single files and are very dumb but effective.
 
+## makeacces (formerly makemp3)
+Takes an input file, generally a broadcast master, transcodes to 320kbps mp3. Embeds ID3 tags if present (either in source file or in sidecar txt file). Embeds png image of "Cover Art" if png or tif present in source directory.
+
 ## makebarcodes
 This script is used to generate barcode files that can be printed by our Zebra barcode printers. It makes a temporary file in your current directory. Then, for each side of a record, it asks for the title of the content, then the barcode: cusb_[label-abbrev]_[issue-number]_[copy(optional)]_[matrix-number]_[take-number]. Used for patron requests mostly. Once done, follow steps outlined in wiki doc Printing Barcodes
 
@@ -60,9 +63,6 @@ Has flags for fades (-ff), national jukebox names (-nj), stereo (-s), normalize 
 Takes an input string which is the canonical name for our digitized objects [a1234, cusb_col_a12_01_5678_00] and the transaction number from Aeon to which this DIP is linked. Transcodes from source objects if necessary, hashmoves them to DIP directory, zips DIP directory in anticipation of upload via FTP to Aeon server.
 
 Has flags for startObject (-so), transactionNumber (-tn), mode (--tape for tapes, --disc coming soon), zip (-z) to make a .zip file
-
-## makemp3
-Takes an input file, generally a broadcast master, transcodes to 320kbps mp3. Embeds ID3 tags if present (either in source file or in sidecar txt file). Embeds png image of "Cover Art" if png or tif present in source directory.
 
 ## makeqctoolsreport
 Takes an input video file, and outputs a compressed xml file that can be read by QCTools. It has to transcode it to a raw video format first so this script takes some time and processor space and is generally run Friday afternoon over a week of new captures, and runs into the weekend.
