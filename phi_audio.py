@@ -1,6 +1,20 @@
 '''
-#nj_audio.py
-#processes audio files for the national jukebox project at UCSB
+typically called by filemaker script in the EDVR database in response to user clicking the "capture" checkbox.
+
+Calling filemaker script: indv_transferred
+parameter passed:  item barcode
+	example:
+		ack_col_56346f_01_w206626_03
+		ucsb_ed_51193_01_9050_0a
+
+renames files in the archive
+the barcode passed in as a param starts with 'ucsb_' but the filenames of recordings stored in the repo start with 'cusb_'
+
+as a subprocess this script calls "makebroadcast.py" which runs a ffmpeg process
+as a subprocess this script calls bwfmetaedit
+as a subprocess this script calls hashmove.py
+as a subprocess this script may call makesip.py
+
 '''
 import os
 import sys
@@ -29,9 +43,11 @@ def wait_for_wavelab(kwargs):
 	while timeDiff < 900:
 		try:
 			if os.path.exists(os.path.join(kwargs.archDir, kwargs._fname)):
-				os.rename(os.path.join(kwargs.archDir, kwargs._fname), kwargs.archiveFP_pre) #changes filenames to cusb
+				if 'ucsb_' in kwargs._fname:
+					os.rename(os.path.join(kwargs.archDir, kwargs._fname), kwargs.archiveFP_pre) #changes filenames to cusb ??
 			if os.path.exists(os.path.join(kwargs.broadDir, kwargs._fname)):
-				os.rename(os.path.join(kwargs.broadDir, kwargs._fname), kwargs.broadcastFP)
+				if 'ucsb_' in kwargs._fname:
+					os.rename(os.path.join(kwargs.broadDir, kwargs._fname), kwargs.broadcastFP)
 			elif not os.path.exists(kwargs.archiveFP_pre) or not os.path.exists(kwargs.broadcastFP):
 				print "buddy, something went wrong"
 				sys.exit()
@@ -71,7 +87,7 @@ def init():
 	'''
 	global conf
 	conf = rawconfig.config()
-	parser = argparse.ArgumentParser(description="processes disc transfers for NJ project")
+	parser = argparse.ArgumentParser(description="processes disc transfer files during digitization")
 	parser.add_argument("input",help="the barcode of the disc you'd like to process")
 	args = parser.parse_args()
 	kwargs = ut.dotdict({})
@@ -88,9 +104,10 @@ def init():
 		foo = raw_input("Please check that the file was named correctly and saved to the correct directory")
 		sys.exit()
 	else:
-		os.rename(os.path.join(kwargs.archDir, kwargs._fname), os.path.join(kwargs.archDir, kwargs._fname).replace("ucsb_","cusb_"))
-		os.rename(os.path.join(kwargs.broadDir, kwargs._fname), os.path.join(kwargs.broadDir, kwargs._fname).replace("ucsb_","cusb_"))
-		kwargs.barcode = kwargs.barcode.replace("ucsb","cusb") #stupid, stupid bug
+		if 'ucsb_' in kwargs._fname:
+			os.rename(os.path.join(kwargs.archDir, kwargs._fname),  os.path.join(kwargs.archDir,  kwargs._fname).replace("ucsb_","cusb_"))
+			os.rename(os.path.join(kwargs.broadDir, kwargs._fname), os.path.join(kwargs.broadDir, kwargs._fname).replace("ucsb_","cusb_"))
+		kwargs.barcode = kwargs.barcode.replace("ucsb","cusb") #stupid, stupid bug. The printed barcodes start with 'ucsb_' rather than using the sigla 'cusb_'
 		kwargs.fname = kwargs.barcode + ".wav"
 		kwargs.archive_fname = kwargs.barcode + "m.wav" #make the new filename
 		kwargs.broadcast_fname = kwargs.barcode + ".wav"
@@ -111,7 +128,7 @@ def main():
 	args, kwargs = init()
 	wait_for_wavelab(kwargs)
 	###make broadcast master###
-	output = subprocess.check_output([conf.python, os.path.join(conf.scriptRepo,'makebroadcast.py'), '-i', kwargs.broadcastFP,'-f','-nj']) #makebroadcast with fades, nj naming
+	output = subprocess.check_output([conf.python, os.path.join(conf.scriptRepo,'makebroadcast.py'), '-i', kwargs.broadcastFP,'-f','-nj']) #makebroadcast with fades, national jukebox project file naming
 	log(output)
 	#pop them into the qc dir in a subdir named after their filename
 	#hashmove makes end dir if it doesnt exist already
