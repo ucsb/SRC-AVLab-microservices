@@ -38,25 +38,23 @@ def wait_for_wavelab(kwargs):
 	###VERIFY WE CAN WORK ON THIS FILE###
 	startTime = time.time()
 	timeDiff = time.time() - startTime
-	#try to rename it once every 3mins for 15mins
+	#try to rename it once every 2 seconds for 30 seconds
 	#this basically waits for the user to close this file in Wavelab
-	while timeDiff < 900:
+	while timeDiff < 30:
 		try:
-			if os.path.exists(os.path.join(kwargs.archDir, kwargs._fname)):
-				if 'ucsb_' in kwargs._fname:
-					os.rename(os.path.join(kwargs.archDir, kwargs._fname), kwargs.archiveFP_pre) #changes filenames to cusb ??
-			if os.path.exists(os.path.join(kwargs.broadDir, kwargs._fname)):
-				if 'ucsb_' in kwargs._fname:
-					os.rename(os.path.join(kwargs.broadDir, kwargs._fname), kwargs.broadcastFP)
+			if os.path.exists(os.path.join(kwargs.archDir, kwargs._fname)) and 'ucsb_' in kwargs._fname:
+				os.rename(os.path.join(kwargs.archDir, kwargs._fname), kwargs.archiveFP_pre) #changes filenames to cusb ??
+			if os.path.exists(os.path.join(kwargs.broadDir, kwargs._fname))and 'ucsb_' in kwargs._fname:
+				os.rename(os.path.join(kwargs.broadDir, kwargs._fname), kwargs.broadcastFP)
 			elif not os.path.exists(kwargs.archiveFP_pre) or not os.path.exists(kwargs.broadcastFP):
 				print "buddy, something went wrong"
 				sys.exit()
 			else:
 				return
 		except OSError,e:
-			time.sleep(60)
+			time.sleep(2)
 			timeDiff = time.time() - startTime
-	if timeDiff	>= 900.0:
+	if timeDiff	>= 30.0:
 		log(**{"message":"attempt to process " + kwargs.fname + " timed out because this file is open in another program","level":"warning","print":True})
 		log(**{"message":"Please check that this file is closed in Wavelab","print":True})
 		foo = raw_input("To re-try processing, uncheck and re-check the 'transferred' box on this matrix's FileMaker record")
