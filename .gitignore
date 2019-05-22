@@ -8,3 +8,4 @@ src*
 *.log
 *.pyc
 microservices-config.ini
+venv/
