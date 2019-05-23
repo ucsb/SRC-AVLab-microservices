@@ -13,7 +13,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--source", required=True, help="The directory under which will be found .WAV files wich will be converted to MP3s")
 parser.add_argument("--destination", help="The directory where the new MP3 files will be created.  If not specified the MP3 will be placed in the same directory as the source .WAV")
-parser.add_argument("--normalizationScheme", help="The normalizaton scheme to be used.  Either 'ebu' or 'rms' ")
+parser.add_argument("--normalizationScheme", help="The normalizaton scheme to be used.  Either 'ebu' or 'rms'. EBU is the default scheme. ")
 args = parser.parse_args()
 
 rootDir = args.source
@@ -75,9 +75,9 @@ def makeMp3(dirName, sourceBroadcastWav):
     if dirName == rootDir:
         return
     destinationFileName, wav = os.path.splitext(sourceBroadcastWav)
-    print("\ncreating a normalized MP3 file for: " + dirName + "/")
+    print("\ncreating a normalized MP3 file for: " + dirLastPart + "/")
 
-    # defalut normalization scheme is rms but you can specify one on the command line if you like
+    # defalut normalization scheme is ebu but you can specify one on the command line if you like
     if(args.normalizationScheme != None):
         print("using normalization scheme from command line")
         normalizationScheme = args.normalizationScheme
@@ -89,7 +89,7 @@ def makeMp3(dirName, sourceBroadcastWav):
 ## example command invocation:    python ffmpeg-normalize -o ~/Downloads/temp.mp3 --audio-codec libmp3lame  -nt ebu -v --target-level -16
     # here we call 'ffmpeg-normalize' with various flags so it will create the normalized MP3 file. LUFS -16
     # 05.02.2019, added "--dual-mono" at the end of the below call to attempt to fix pecularities, SE
-    subprocess.call(["python", "/usr/local/bin/ffmpeg-normalize", dirName + "/" + sourceBroadcastWav, "-o", dirName + "/" + destinationFileName + '.mp3', "-nt", normalizationScheme, "--target-level", "-16", "--audio-codec", "libmp3lame", "--output-format", "mp3", "--audio-bitrate", "320k", "--true-peak", "-0.1", "--dual-mono"])
+    subprocess.call(["python", "/usr/local/bin/ffmpeg-normalize", dirName + "/" + sourceBroadcastWav, "-o", dirName + "/" + destinationFileName + 'd.mp3', "-nt", normalizationScheme, "--target-level", "-16", "--audio-codec", "libmp3lame", "--output-format", "mp3", "--audio-bitrate", "320k", "--true-peak", "-0.1", "--dual-mono"])
 
 
 def main():
@@ -97,11 +97,12 @@ def main():
     main() function runs if this script is called directly by the python interpreter rather than being imported into some other Python script
     '''
     global conf
+    global dirLastPart
     for dirName, subdirList, fileList in os.walk(rootDir):
         theTuple = os.path.split(dirName)
         dirLastPart = theTuple[1]
         if(any(ismp3(n) for n in fileList)):
-            print("skipping " + dirName + "/ as it has at least one MP3 already" + "\n")
+            print("skipping " + dirLastPart + "/ as it already has an MP3 " + "\n")
             mp3sInDir = mp3sInFileList(fileList)
         # elif(isNotEdison(dirLastPart)):
         #     print("skipping " + dirLastPart + "/ as it is Not an edison" )
