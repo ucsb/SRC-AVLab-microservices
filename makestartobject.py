@@ -185,6 +185,12 @@ def parse_input(startObj):
 		startObj = discname(startObj, allists['disclist'])
 		return startObj
 	match=''
+	match=re.search(r"^ack_", startObj)
+	if match:
+		#print "it's an ackerman disc"
+		startObj = discname(startObj, allists['disclist'])
+		return startObj
+	match=''
 	match=re.search(r"^cusb-cyl\d+", startObj)
 	if match:
 		#print "it's a cusb-cylindername"
